@@ -1,10 +1,10 @@
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, Theme, ThemeProvider, createTheme } from '@mui/material';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 import Home from './home/Home';
 
 function App(): JSX.Element {
 
-    const defaultTheme = createTheme({
+    const defaultTheme: Theme = createTheme({
         palette: {
             mode: 'light',
         }

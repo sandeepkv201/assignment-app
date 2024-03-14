@@ -16,7 +16,7 @@ function Home(): JSX.Element {
      * @param products 
      * @param selectedCategory 
      */
-    const runReport = (products: Product[], selectedCategory: string) => {
+    const runReport = (products: Product[], selectedCategory: string): void => {
         console.log('chartData', products);
         setYAxisTitle(selectedCategory);
         setCategories(products.map(product => product.title));
