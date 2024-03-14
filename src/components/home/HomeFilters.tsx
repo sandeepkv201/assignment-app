@@ -7,8 +7,9 @@ import Product from "../../models/Product";
 import { RootState } from "../../store";
 import { setCategory } from "../../store/slices/categorySlice";
 import { setProducts } from "../../store/slices/productsSlice";
+import ClearButton from "../common/ClearButton";
 
-export default function HomeFiters({ runReport }: any) {
+export default function HomeFiters({ runReport }: any): JSX.Element {
 
     const dispatch = useDispatch();
 
@@ -23,14 +24,14 @@ export default function HomeFiters({ runReport }: any) {
     /**
      * Fetches categories on component mount.
      */
-    useEffect(() => {
+    useEffect((): void => {
         axios.get('/products/categories').then((resp: AxiosResponse<string[]>) => setCategoryOptions(resp.data));
     }, []);
 
     /**
      * Fetch products list on category chnages.
      */
-    useEffect(() => {
+    useEffect((): void => {
         if (selectedCategory) {
             dispatch(setProducts([]));
             axios.get(`/products/category/${selectedCategory}`).then((resp: AxiosResponse<any>) => setProductOptions(resp.data?.products ?? []));
@@ -42,17 +43,32 @@ export default function HomeFiters({ runReport }: any) {
     /**
      * Handle clear button actions
      */
-    const clearFiltersHandler = () => {
+    const clearFiltersHandler = (): void => {
         dispatch(setCategory('')); // Clear Selected Category.
         dispatch(setProducts([])); // Clear Selected Product.
         runReport([], ''); // Remove Charts by clearing products data.
     };
 
     /**
+     * Handle Clear Category Selection
+     */
+    const clearCategoryHandler = (): void => {
+        dispatch(setCategory('')); // Clear Selected Category.
+        runReport([], ''); // Remove Charts by clearing products data.
+    };
+
+    /**
+     * Handle Clear Product Selection
+     */
+    const clearProductHandler = (): void => {
+        dispatch(setProducts([])); // Clear Selected Product.
+    };
+
+    /**
      * Filter Products to be shown in Chart based on selected Products in Dropdown.
      * @returns 
      */
-    const filterSelectedProducts = () => {
+    const filterSelectedProducts = (): Product[] => {
         console.log('selectedProducts', selectedProducts);
         if (selectedProducts.length === 0) {
             return [...productOptions];
@@ -66,12 +82,27 @@ export default function HomeFiters({ runReport }: any) {
     /**
      * Shows Loader in Button for 3s and displays report.
      */
-    const runReportHandler = () => {
+    const runReportHandler = (): void => {
         setLoading(true);
         setTimeout(() => {
             runReport(filterSelectedProducts(), selectedCategory);
             setLoading(false);
         }, 3000);
+    };
+
+    const renderCategoryValue = (value: string): string => value ? value : 'Select Category';
+
+    const renderProductValues = (values: number[]): string => {
+        if (values?.length > 0) {
+            let displayText: string = '';
+            const product = productOptions.filter((product: Product) => values.includes(product.id))[0] as Product;
+            displayText += product.title;
+            if (values?.length > 1) {
+                displayText += ` +${values.length - 1} others`;
+            }
+            return displayText;
+        }
+        return 'Select Product';
     };
 
     const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
@@ -84,12 +115,23 @@ export default function HomeFiters({ runReport }: any) {
             </Stack>
             <Stack rowGap={3}>
                 <FormControl fullWidth>
-                    <Select value={selectedCategory} onChange={(event) => dispatch(setCategory(event.target.value))} placeholder="Select Category">
+                    <Select
+                        value={selectedCategory}
+                        onChange={(event) => dispatch(setCategory(event.target.value))}
+                        displayEmpty renderValue={renderCategoryValue}
+                        endAdornment={<ClearButton onClick={clearCategoryHandler} />}
+                    >
                         {categoryOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
                     </Select>
                 </FormControl>
                 <FormControl fullWidth disabled={isCategoryNotSelected}>
-                    <Select multiple value={selectedProducts} onChange={(event) => dispatch(setProducts(event.target.value as number[]))} disabled={isCategoryNotSelected}>
+                    <Select multiple
+                        value={selectedProducts}
+                        onChange={(event) => dispatch(setProducts(event.target.value as number[]))}
+                        disabled={isCategoryNotSelected}
+                        displayEmpty renderValue={renderProductValues}
+                        endAdornment={<ClearButton onClick={clearProductHandler} disabled={isCategoryNotSelected} />}
+                    >
                         {productOptions.map(option => (<MenuItem key={option.id} value={option.id}>{option.title}</MenuItem>))}
                     </Select>
                 </FormControl>

@@ -2,7 +2,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from "highcharts-react-official";
 import { useRef } from "react";
 
-export default function HighChartsColumn({ categories, series, yAxisTitle = '', ...props }: HighchartsReact.Props) {
+export default function HighChartsColumn({ categories, series, yAxisTitle = '', ...props }: HighchartsReact.Props): JSX.Element {
 
     const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 

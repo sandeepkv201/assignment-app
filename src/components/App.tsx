@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 import Home from './home/Home';
 
-function App() {
+function App(): JSX.Element {
 
     const defaultTheme = createTheme({
         palette: {
