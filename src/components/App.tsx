@@ -1,6 +1,7 @@
 import { CssBaseline, Theme, ThemeProvider, createTheme } from '@mui/material';
+import { Router } from '@remix-run/router';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
-import Home from './home/Home';
+import Dashboard from './home/Dashboard';
 
 function App(): JSX.Element {
 
@@ -10,8 +11,8 @@ function App(): JSX.Element {
         }
     });
 
-    const hashRouter = createHashRouter([
-        { path: '/', Component: Home }
+    const hashRouter: Router = createHashRouter([
+        { path: '/', Component: Dashboard }
     ]);
 
     return (

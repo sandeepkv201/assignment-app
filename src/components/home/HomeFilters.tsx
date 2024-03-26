@@ -1,23 +1,22 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, FormControl, MenuItem, Select, Stack, Typography } from "@mui/material";
+import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Product from "../../models/Product";
+import Product, { ProductResponse } from "../../models/Product";
 import { RootState } from "../../store";
-import { setCategory } from "../../store/slices/categorySlice";
-import { setProducts } from "../../store/slices/productsSlice";
-import ClearButton from "../common/ClearButton";
+import { clearCategory, setCategory } from "../../store/slices/categorySlice";
+import { clearProducts, setProducts } from "../../store/slices/productsSlice";
 
-export default function HomeFiters({ runReport }: any): JSX.Element {
+export default function HomeFiters({ runReport, runPie }: any): JSX.Element {
 
     const dispatch = useDispatch();
 
     const selectedCategory = useSelector<RootState>((state) => state.category) as string;
-    const selectedProducts = useSelector<RootState>((state) => state.products) as number[];
+    const selectedProducts = useSelector<RootState>((state) => state.products) as Product[];
 
-    const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
-    const [productOptions, setProductOptions] = useState<Product[]>([]);
+    const [categoryOptions, setCategoryOptions] = useState<string[]>([] as string[]);
+    const [productOptions, setProductOptions] = useState<Product[]>([] as Product[]);
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -25,7 +24,9 @@ export default function HomeFiters({ runReport }: any): JSX.Element {
      * Fetches categories on component mount.
      */
     useEffect((): void => {
-        axios.get('/products/categories').then((resp: AxiosResponse<string[]>) => setCategoryOptions(resp.data));
+        axios.get('/products/categories').then(({ data }: AxiosResponse<string[]>) => {
+            setCategoryOptions(data); // Set Category Options.
+        });
     }, []);
 
     /**
@@ -33,50 +34,26 @@ export default function HomeFiters({ runReport }: any): JSX.Element {
      */
     useEffect((): void => {
         if (selectedCategory) {
-            dispatch(setProducts([]));
-            axios.get(`/products/category/${selectedCategory}`).then((resp: AxiosResponse<any>) => setProductOptions(resp.data?.products ?? []));
+            axios.get(`/products/category/${selectedCategory}`).then(({ data }: AxiosResponse<ProductResponse>) => {
+                // Use Optional Chain to handle empty product options.
+                dispatch(clearProducts());
+                setProductOptions(data?.products ?? []);
+                runReport(data?.products ?? []);
+            });
         } else {
-            setProductOptions([]);
+            // Clear Selected Product and product options.
+            setProductOptions([] as Product[]);
+            dispatch(clearProducts()); // Clear Selected Product.
+            runPie(categoryOptions, 100 / categoryOptions.length);
         }
-    }, [dispatch, selectedCategory]);
+    }, [dispatch, runReport, runPie, categoryOptions, selectedCategory]);
 
     /**
      * Handle clear button actions
      */
     const clearFiltersHandler = (): void => {
-        dispatch(setCategory('')); // Clear Selected Category.
-        dispatch(setProducts([])); // Clear Selected Product.
-        runReport([], ''); // Remove Charts by clearing products data.
-    };
-
-    /**
-     * Handle Clear Category Selection
-     */
-    const clearCategoryHandler = (): void => {
-        dispatch(setCategory('')); // Clear Selected Category.
-        runReport([], ''); // Remove Charts by clearing products data.
-    };
-
-    /**
-     * Handle Clear Product Selection
-     */
-    const clearProductHandler = (): void => {
-        dispatch(setProducts([])); // Clear Selected Product.
-    };
-
-    /**
-     * Filter Products to be shown in Chart based on selected Products in Dropdown.
-     * @returns 
-     */
-    const filterSelectedProducts = (): Product[] => {
-        console.log('selectedProducts', selectedProducts);
-        if (selectedProducts.length === 0) {
-            return [...productOptions];
-        }
-        else if (selectedProducts?.length >= 4) {
-            return productOptions.filter((product: Product) => selectedProducts.includes(product.id));
-        }
-        return [];
+        dispatch(clearProducts()); // Clear Selected Product.
+        dispatch(clearCategory()); // Clear Selected Category.
     };
 
     /**
@@ -85,56 +62,38 @@ export default function HomeFiters({ runReport }: any): JSX.Element {
     const runReportHandler = (): void => {
         setLoading(true);
         setTimeout(() => {
-            runReport(filterSelectedProducts(), selectedCategory);
+            runReport(selectedProducts.length === 0 ? [...productOptions] : [...selectedProducts]);
             setLoading(false);
         }, 3000);
-    };
-
-    const renderCategoryValue = (value: string): string => value ? value : 'Select Category';
-
-    const renderProductValues = (values: number[]): string => {
-        if (values?.length > 0) {
-            let displayText: string = '';
-            const product = productOptions.filter((product: Product) => values.includes(product.id))[0] as Product;
-            displayText += product.title;
-            if (values?.length > 1) {
-                displayText += ` +${values.length - 1} others`;
-            }
-            return displayText;
-        }
-        return 'Select Product';
     };
 
     const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
 
     return (
-        <Stack gap={3} padding={3} flexGrow={1} sx={{ borderStyle: 'solid' }}>
+        <Stack gap={3} padding={3} sx={{ borderStyle: 'solid' }}>
             <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
                 <Typography variant="h5">Filters</Typography>
                 <Button variant="text" onClick={clearFiltersHandler}>Clear</Button>
             </Stack>
             <Stack rowGap={3}>
-                <FormControl fullWidth>
-                    <Select
-                        value={selectedCategory}
-                        onChange={(event) => dispatch(setCategory(event.target.value))}
-                        displayEmpty renderValue={renderCategoryValue}
-                        endAdornment={<ClearButton onClick={clearCategoryHandler} />}
-                    >
-                        {categoryOptions.map(option => (<MenuItem key={option} value={option}>{option}</MenuItem>))}
-                    </Select>
-                </FormControl>
-                <FormControl fullWidth disabled={isCategoryNotSelected}>
-                    <Select multiple
-                        value={selectedProducts}
-                        onChange={(event) => dispatch(setProducts(event.target.value as number[]))}
-                        disabled={isCategoryNotSelected}
-                        displayEmpty renderValue={renderProductValues}
-                        endAdornment={<ClearButton onClick={clearProductHandler} disabled={isCategoryNotSelected} />}
-                    >
-                        {productOptions.map(option => (<MenuItem key={option.id} value={option.id}>{option.title}</MenuItem>))}
-                    </Select>
-                </FormControl>
+                <Autocomplete
+                    id="select-category" autoHighlight
+                    options={categoryOptions ?? []}
+                    onChange={(event, value: any) => dispatch(value ? setCategory(value) : clearCategory())}
+                    value={selectedCategory} isOptionEqualToValue={(a, b) => a === b}
+                    renderInput={(params) => <TextField {...params} placeholder="Select Category" />}
+                    sx={{ width: 400 }}
+                />
+                <Autocomplete
+                    id="select-product" multiple autoHighlight disableCloseOnSelect disabled={isCategoryNotSelected}
+                    options={productOptions.map((option: Product) => option) ?? []}
+                    getOptionKey={((value: Product) => value.id)}
+                    getOptionLabel={(option: Product) => option.title}
+                    onChange={(_event, value: Product[]) => dispatch(value.length > 0 ? setProducts(value) : clearProducts())}
+                    value={selectedProducts} isOptionEqualToValue={(a, b) => a.id === b.id}
+                    renderInput={(params) => <TextField {...params} placeholder="Select Product" />}
+                    sx={{ width: 400 }}
+                />
             </Stack>
             <LoadingButton size="large" sx={{ mt: 'auto' }} onClick={runReportHandler} loading={loading} variant="contained" disabled={isCategoryNotSelected} color="primary">
                 Run Report

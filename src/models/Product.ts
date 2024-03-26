@@ -1,3 +1,8 @@
+
+export interface ProductResponse {
+    products: Product[]
+}
+
 export default interface Product {
     id: number;
     title: string;
