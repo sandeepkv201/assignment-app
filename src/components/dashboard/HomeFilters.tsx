@@ -82,7 +82,7 @@ export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.El
                     onChange={(event, value: any) => dispatch(value ? setCategory(value) : clearCategory())}
                     value={selectedCategory} isOptionEqualToValue={(a, b) => a === b}
                     renderInput={(params) => <TextField {...params} placeholder="Select Category" />}
-                    sx={{ width: 400 }}
+                    sx={{ width: 300 }}
                 />
                 <Autocomplete
                     id="select-product" multiple autoHighlight disableCloseOnSelect disabled={isCategoryNotSelected}
@@ -92,7 +92,7 @@ export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.El
                     onChange={(_event, value: Product[]) => dispatch(value.length > 0 ? setProducts(value) : clearProducts())}
                     value={selectedProducts} isOptionEqualToValue={(a, b) => a.id === b.id}
                     renderInput={(params) => <TextField {...params} placeholder="Select Product" />}
-                    sx={{ width: 400 }}
+                    sx={{ width: 300 }}
                 />
             </Stack>
             <LoadingButton size="large" sx={{ mt: 'auto' }} onClick={runReportHandler} loading={loading} variant="contained" disabled={isCategoryNotSelected} color="primary">
