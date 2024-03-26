@@ -8,7 +8,7 @@ import { RootState } from "../../store";
 import { clearCategory, setCategory } from "../../store/slices/categorySlice";
 import { clearProducts, setProducts } from "../../store/slices/productsSlice";
 
-export default function HomeFiters({ runReport, runPie }: any): JSX.Element {
+export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.Element {
 
     const dispatch = useDispatch();
 

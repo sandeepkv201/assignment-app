@@ -1,7 +1,7 @@
 import { CssBaseline, Theme, ThemeProvider, createTheme } from '@mui/material';
 import { Router } from '@remix-run/router';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
-import Dashboard from './home/Dashboard';
+import Dashboard from './dashboard/Dashboard';
 
 function App(): JSX.Element {
 

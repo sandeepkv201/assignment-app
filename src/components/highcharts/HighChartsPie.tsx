@@ -2,7 +2,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from "highcharts-react-official";
 import { useRef } from "react";
 
-export default function HighChartsPie({ chartTitle = '', series = [], ...props }: HighchartsReactProps): JSX.Element {
+export default function HighChartsPie({ chartTitle = '', series = [], ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
     const chartComponentRef = useRef<HighchartsReactRefObject>(null);
 
@@ -14,9 +14,7 @@ export default function HighChartsPie({ chartTitle = '', series = [], ...props }
                 return Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 0 }).format(value / 100);
             }
         },
-        title: {
-            text: chartTitle
-        },
+        title: { text: chartTitle, align: 'left' },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}</b>'
         },

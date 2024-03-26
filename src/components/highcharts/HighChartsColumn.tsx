@@ -2,7 +2,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from "highcharts-react-official";
 import { useRef } from "react";
 
-export default function HighChartsColumn({ chartTitle = '', categories = [], series = [], yAxisTitle = 'Values', ...props }: HighchartsReactProps): JSX.Element {
+export default function HighChartsColumn({ chartTitle = '', categories = [], series = [], yAxisTitle = 'Values', ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
     const chartComponentRef = useRef<HighchartsReactRefObject>(null);
 
@@ -13,7 +13,7 @@ export default function HighChartsColumn({ chartTitle = '', categories = [], ser
                 return Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
             }
         },
-        title: { text: chartTitle },
+        title: { text: chartTitle, align: 'left' },
         legend: { enabled: false },
         plotOptions: {
             column: {
