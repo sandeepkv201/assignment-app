@@ -20,8 +20,7 @@ function Dashboard(): JSX.Element {
     /**
      * Handle Products to be shown in Chart an prepares series data for chart
      */
-    const runReport = useCallback((products: Product[]): void => {
-        console.log('chartData', products);
+    const runProductsReport = useCallback((products: Product[]): void => {
         setShowColumnChart(true);
         setAxisCategories(products.map(product => product.title));
         setColumnSeries([{ name: 'Price', data: products.map(product => product.price) }]);
@@ -39,7 +38,7 @@ function Dashboard(): JSX.Element {
 
     return (
         <Stack direction={'row'} padding={3} gap={3} height={'100vh'} alignItems={'stretch'}>
-            <HomeFiters runReport={runReport} runPieReport={runPieReport} />
+            <HomeFiters runColumnReport={runProductsReport} runPieReport={runPieReport} />
             <Stack gap={3} flexGrow={1} justifyContent={'center'}>
                 {showColumnChart ? (
                     <HighChartsColumn

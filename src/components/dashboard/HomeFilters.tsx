@@ -8,7 +8,7 @@ import { RootState } from "../../store";
 import { clearCategory, setCategory } from "../../store/slices/categorySlice";
 import { clearProducts, setProducts } from "../../store/slices/productsSlice";
 
-export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): JSX.Element {
+export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<any>): JSX.Element {
 
     const dispatch = useDispatch();
 
@@ -19,6 +19,31 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
     const [productOptions, setProductOptions] = useState<Product[]>([] as Product[]);
 
     const [loading, setLoading] = useState<boolean>(false);
+
+    /**
+     * Fetches categories on component mount.
+     */
+    useEffect((): void => {
+        axios.get('/products/categories').then(({ data }: AxiosResponse<string[]>) => {
+            setCategoryOptions(data);
+            runPieReport(data, 100 / data.length);
+        });
+    }, [runPieReport]);
+
+    /**
+     * Fetch products list on category chnages.
+     */
+    useEffect((): void => {
+        if (selectedCategory) {
+            axios.get(`/products/category/${selectedCategory}`).then(({ data }: AxiosResponse<ProductResponse>) => {
+                dispatch(clearProducts()); // Clear products Selection
+                setProductOptions(data?.products ?? []); // Use Optional Chain to handle empty product options.
+            });
+        } else {
+            setProductOptions([] as Product[]); // Clear Product Options.
+            dispatch(clearProducts()); // Clear Selected Product.
+        }
+    }, [dispatch, selectedCategory]);
 
     /**
      * Handle clear button actions
@@ -36,7 +61,7 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
         setLoading(true);
         if (selectedCategory) {
             setTimeout(() => {
-                runReport(selectedProducts.length === 0 ? [...productOptions] : [...selectedProducts], selectedCategory);
+                runColumnReport(selectedProducts.length === 0 ? [...productOptions] : [...selectedProducts], selectedCategory);
                 setLoading(false);
             }, 3000);
         } else {
@@ -54,36 +79,6 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
     };
 
     const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
-
-    /**
-     * Fetches categories on component mount.
-     */
-    useEffect((): void => {
-        axios.get('/products/categories').then(({ data }: AxiosResponse<string[]>) => {
-            setCategoryOptions(data); // Set Category Options.
-        });
-    }, []);
-
-    /**
-     * Fetch products list on category chnages.
-     */
-    useEffect((): void => {
-        if (selectedCategory) {
-            axios.get(`/products/category/${selectedCategory}`).then(({ data }: AxiosResponse<ProductResponse>) => {
-                // Use Optional Chain to handle empty product options.
-                dispatch(clearProducts());
-                setProductOptions(data?.products ?? []);
-            });
-        } else {
-            // Clear Selected Product and product options.
-            setProductOptions([] as Product[]);
-            dispatch(clearProducts()); // Clear Selected Product.
-        }
-    }, [dispatch, selectedCategory]);
-
-    useEffect(() => {
-        runPieReport(categoryOptions, 100 / categoryOptions.length);
-    }, [runPieReport, categoryOptions]);
 
     return (
         <Stack gap={3} padding={3} sx={{ borderStyle: 'solid' }}>
@@ -111,9 +106,10 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
                     sx={{ width: 300 }}
                 />
             </Stack>
-            <LoadingButton size="large" sx={{ mt: 'auto' }} onClick={runReportHandler} loading={loading} variant="contained" disabled={isCategoryNotSelected} color="primary">
-                Run Report
-            </LoadingButton>
+            <LoadingButton
+                size="large" sx={{ mt: 'auto' }} onClick={runReportHandler} loading={loading}
+                variant="contained" disabled={isCategoryNotSelected} color="primary"
+            >Run Report</LoadingButton>
         </Stack>
     );
 }
