@@ -44,6 +44,15 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
         }
     };
 
+    const handleCategoryValueChange = (value: string | null) => {
+        if (value) {
+            dispatch(setCategory(value));
+        } else {
+            dispatch(clearCategory());
+            runPieReport(categoryOptions, 100 / categoryOptions.length);
+        }
+    };
+
     const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
 
     /**
@@ -86,7 +95,7 @@ export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): 
                 <Autocomplete
                     id="select-category" autoHighlight
                     options={categoryOptions ?? []}
-                    onChange={(event, value: any) => dispatch(value ? setCategory(value) : clearCategory())}
+                    onChange={(_event, value: string | null) => handleCategoryValueChange(value)}
                     value={selectedCategory} isOptionEqualToValue={(a, b) => a === b}
                     renderInput={(params) => <TextField {...params} placeholder="Select Category" />}
                     sx={{ width: 300 }}

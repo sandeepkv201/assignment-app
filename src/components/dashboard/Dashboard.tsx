@@ -11,6 +11,7 @@ function Dashboard(): JSX.Element {
 
     const selectedCategory = useSelector<RootState>((state) => state.category) as string;
 
+    const [showColumnChart, setShowColumnChart] = useState<boolean>(false);
     const [axisCategories, setAxisCategories] = useState<string[]>([]);
     const [columnSeries, setColumnSeries] = useState<any[]>([]);
 
@@ -21,6 +22,7 @@ function Dashboard(): JSX.Element {
      */
     const runReport = useCallback((products: Product[]): void => {
         console.log('chartData', products);
+        setShowColumnChart(true);
         setAxisCategories(products.map(product => product.title));
         setColumnSeries([{ name: 'Price', data: products.map(product => product.price) }]);
         setPieSeries([]);
@@ -30,6 +32,7 @@ function Dashboard(): JSX.Element {
      * Handle Categories Overview to be shown in Pie Chart.
      */
     const runPieReport = useCallback((categories: string[], y: number) => {
+        setShowColumnChart(false);
         setColumnSeries([]);
         setPieSeries([{ name: 'Series', colorByPoint: true, data: categories.map(name => ({ name, y })) }]);
     }, []);
@@ -38,13 +41,13 @@ function Dashboard(): JSX.Element {
         <Stack direction={'row'} padding={3} gap={3} height={'100vh'} alignItems={'stretch'}>
             <HomeFiters runReport={runReport} runPieReport={runPieReport} />
             <Stack gap={3} flexGrow={1} justifyContent={'center'}>
-                {!selectedCategory ? (
-                    <HighChartsPie series={pieSeries} chartTitle={'Categories Overview'} />
-                ) : (
+                {showColumnChart ? (
                     <HighChartsColumn
                         categories={axisCategories} series={columnSeries}
                         yAxisTitle={`${selectedCategory} price`} chartTitle={`Products in ${selectedCategory} Category`}
                     />
+                ) : (
+                    <HighChartsPie series={pieSeries} chartTitle={'Categories Overview'} />
                 )}
             </Stack>
         </Stack>
