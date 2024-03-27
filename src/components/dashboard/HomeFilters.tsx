@@ -8,7 +8,7 @@ import { RootState } from "../../store";
 import { clearCategory, setCategory } from "../../store/slices/categorySlice";
 import { clearProducts, setProducts } from "../../store/slices/productsSlice";
 
-export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.Element {
+export default function HomeFiters({ runReport, runPieReport }: Readonly<any>): JSX.Element {
 
     const dispatch = useDispatch();
 
@@ -19,6 +19,32 @@ export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.El
     const [productOptions, setProductOptions] = useState<Product[]>([] as Product[]);
 
     const [loading, setLoading] = useState<boolean>(false);
+
+    /**
+     * Handle clear button actions
+     */
+    const clearFiltersHandler = (): void => {
+        dispatch(clearProducts()); // Clear Selected Product.
+        dispatch(clearCategory()); // Clear Selected Category.
+        runPieReport(categoryOptions, 100 / categoryOptions.length);
+    };
+
+    /**
+     * Shows Loader in Button for 3s and displays report.
+     */
+    const runReportHandler = (): void => {
+        setLoading(true);
+        if (selectedCategory) {
+            setTimeout(() => {
+                runReport(selectedProducts.length === 0 ? [...productOptions] : [...selectedProducts], selectedCategory);
+                setLoading(false);
+            }, 3000);
+        } else {
+            runPieReport(categoryOptions, 100 / categoryOptions.length);
+        }
+    };
+
+    const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
 
     /**
      * Fetches categories on component mount.
@@ -38,36 +64,17 @@ export default function HomeFiters({ runReport, runPie }: Readonly<any>): JSX.El
                 // Use Optional Chain to handle empty product options.
                 dispatch(clearProducts());
                 setProductOptions(data?.products ?? []);
-                runReport(data?.products ?? []);
             });
         } else {
             // Clear Selected Product and product options.
             setProductOptions([] as Product[]);
             dispatch(clearProducts()); // Clear Selected Product.
-            runPie(categoryOptions, 100 / categoryOptions.length);
         }
-    }, [dispatch, runReport, runPie, categoryOptions, selectedCategory]);
+    }, [dispatch, selectedCategory]);
 
-    /**
-     * Handle clear button actions
-     */
-    const clearFiltersHandler = (): void => {
-        dispatch(clearProducts()); // Clear Selected Product.
-        dispatch(clearCategory()); // Clear Selected Category.
-    };
-
-    /**
-     * Shows Loader in Button for 3s and displays report.
-     */
-    const runReportHandler = (): void => {
-        setLoading(true);
-        setTimeout(() => {
-            runReport(selectedProducts.length === 0 ? [...productOptions] : [...selectedProducts]);
-            setLoading(false);
-        }, 3000);
-    };
-
-    const isCategoryNotSelected = !selectedCategory; // Flag to check if category is not selected
+    useEffect(() => {
+        runPieReport(categoryOptions, 100 / categoryOptions.length);
+    }, [runPieReport, categoryOptions]);
 
     return (
         <Stack gap={3} padding={3} sx={{ borderStyle: 'solid' }}>

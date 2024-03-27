@@ -1,6 +1,7 @@
 import Highcharts from 'highcharts';
 import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from "highcharts-react-official";
 import { useRef } from "react";
+import { NumberFormatter } from '../../helpers/formatters';
 
 export default function HighChartsPie({ chartTitle = '', series = [], ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
@@ -10,9 +11,7 @@ export default function HighChartsPie({ chartTitle = '', series = [], ...props }
         chart: {
             plotShadow: false,
             type: 'pie',
-            style: { fontFamily: 'Roboto' }, numberFormatter: function (value: number) {
-                return Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 0 }).format(value / 100);
-            }
+            style: { fontFamily: 'Roboto' }, numberFormatter: NumberFormatter.percent
         },
         title: { text: chartTitle, align: 'left' },
         tooltip: {

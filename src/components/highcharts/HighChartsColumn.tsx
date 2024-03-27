@@ -1,6 +1,7 @@
 import Highcharts from 'highcharts';
 import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from "highcharts-react-official";
 import { useRef } from "react";
+import { NumberFormatter } from '../../helpers/formatters';
 
 export default function HighChartsColumn({ chartTitle = '', categories = [], series = [], yAxisTitle = 'Values', ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
@@ -9,9 +10,7 @@ export default function HighChartsColumn({ chartTitle = '', categories = [], ser
     const options: Highcharts.Options = {
         chart: {
             type: 'column',
-            style: { fontFamily: 'Roboto' }, numberFormatter: function (value: number) {
-                return Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-            }
+            style: { fontFamily: 'Roboto' }, numberFormatter: NumberFormatter.currency
         },
         title: { text: chartTitle, align: 'left' },
         legend: { enabled: false },

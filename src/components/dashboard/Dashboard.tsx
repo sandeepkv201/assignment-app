@@ -13,6 +13,7 @@ function Dashboard(): JSX.Element {
 
     const [axisCategories, setAxisCategories] = useState<string[]>([]);
     const [columnSeries, setColumnSeries] = useState<any[]>([]);
+
     const [pieSeries, setPieSeries] = useState<any[]>([]);
 
     /**
@@ -35,7 +36,7 @@ function Dashboard(): JSX.Element {
 
     return (
         <Stack direction={'row'} padding={3} gap={3} height={'100vh'} alignItems={'stretch'}>
-            <HomeFiters runReport={runReport} runPie={runPieReport} />
+            <HomeFiters runReport={runReport} runPieReport={runPieReport} />
             <Stack gap={3} flexGrow={1} justifyContent={'center'}>
                 {!selectedCategory ? (
                     <HighChartsPie series={pieSeries} chartTitle={'Categories Overview'} />
