@@ -3,17 +3,16 @@ import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from 
 import { useRef } from "react";
 import { NumberFormatter } from '../../helpers/formatters';
 
-export default function HighChartsPie({ chartTitle = '', series = [], ...props }: Readonly<HighchartsReactProps>): JSX.Element {
+export default function HighChartsPie({ options = {}, ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
     const chartComponentRef = useRef<HighchartsReactRefObject>(null);
 
-    const options: Highcharts.Options = {
+    const defaultOptions: Highcharts.Options = {
         chart: {
             plotShadow: false,
             type: 'pie',
             style: { fontFamily: 'Roboto' }, numberFormatter: NumberFormatter.percent
         },
-        title: { text: chartTitle, align: 'left' },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}</b>'
         },
@@ -22,11 +21,10 @@ export default function HighChartsPie({ chartTitle = '', series = [], ...props }
                 cursor: 'pointer',
                 dataLabels: { enabled: true }
             }
-        },
-        series
+        }
     };
 
     return (
-        <HighchartsReact highcharts={Highcharts} options={options} ref={chartComponentRef} {...props} />
+        <HighchartsReact highcharts={Highcharts} options={{ ...defaultOptions, ...options }} ref={chartComponentRef} {...props} />
     );
 }

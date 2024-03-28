@@ -3,31 +3,25 @@ import HighchartsReact, { HighchartsReactProps, HighchartsReactRefObject } from 
 import { useRef } from "react";
 import { NumberFormatter } from '../../helpers/formatters';
 
-export default function HighChartsColumn({ chartTitle = '', categories = [], series = [], yAxisTitle = 'Values', ...props }: Readonly<HighchartsReactProps>): JSX.Element {
+export default function HighChartsColumn({ options = {}, ...props }: Readonly<HighchartsReactProps>): JSX.Element {
 
     const chartComponentRef = useRef<HighchartsReactRefObject>(null);
 
-    const options: Highcharts.Options = {
+    const defaultOptions: Highcharts.Options = {
         chart: {
             type: 'column',
             style: { fontFamily: 'Roboto' }, numberFormatter: NumberFormatter.currency
         },
-        title: { text: chartTitle, align: 'left' },
         legend: { enabled: false },
         plotOptions: {
             column: {
                 cursor: 'pointer',
                 dataLabels: { enabled: true }
             }
-        },
-        xAxis: [{ categories }],
-        yAxis: [{
-            title: { text: yAxisTitle }
-        }],
-        series
+        }
     };
 
     return (
-        <HighchartsReact highcharts={Highcharts} options={options} ref={chartComponentRef} {...props} />
+        <HighchartsReact highcharts={Highcharts} options={{ ...defaultOptions, ...options }} ref={chartComponentRef} {...props} />
     );
 }
