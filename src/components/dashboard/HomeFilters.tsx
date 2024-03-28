@@ -31,21 +31,6 @@ export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<a
     }, [runPieReport]);
 
     /**
-     * Fetch products list on category chnages.
-     */
-    useEffect((): void => {
-        if (selectedCategory) {
-            axios.get(`/products/category/${selectedCategory}`).then(({ data }: AxiosResponse<ProductResponse>) => {
-                dispatch(clearProducts()); // Clear products Selection
-                setProductOptions(data?.products ?? []); // Use Optional Chain to handle empty product options.
-            });
-        } else {
-            setProductOptions([] as Product[]); // Clear Product Options.
-            dispatch(clearProducts()); // Clear Selected Product.
-        }
-    }, [dispatch, selectedCategory]);
-
-    /**
      * Handle clear button actions
      */
     const clearFiltersHandler = (): void => {
@@ -69,11 +54,17 @@ export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<a
         }
     };
 
-    const handleCategoryValueChange = (value: string | null) => {
-        if (value) {
-            dispatch(setCategory(value));
+    const handleCategoryValueChange = (category: string | null) => {
+        if (category) {
+            dispatch(setCategory(category));
+            axios.get(`/products/category/${category}`).then(({ data }: AxiosResponse<ProductResponse>) => {
+                dispatch(clearProducts()); // Clear products Selection
+                setProductOptions(data?.products ?? []); // Use Optional Chain to handle empty product options.
+            });
         } else {
-            dispatch(clearCategory());
+            setProductOptions([] as Product[]); // Clear Product Options.
+            dispatch(clearProducts()); // Clear Selected Product.
+            dispatch(clearCategory()); // Clear Selected Category.
             runPieReport(categoryOptions, 100 / categoryOptions.length);
         }
     };
