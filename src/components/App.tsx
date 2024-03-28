@@ -1,6 +1,4 @@
 import { CssBaseline, Theme, ThemeProvider, createTheme } from '@mui/material';
-import { Router } from '@remix-run/router';
-import { RouterProvider, createHashRouter } from 'react-router-dom';
 import Dashboard from './dashboard/Dashboard';
 
 function App(): JSX.Element {
@@ -11,14 +9,10 @@ function App(): JSX.Element {
         }
     });
 
-    const hashRouter: Router = createHashRouter([
-        { path: '/', Component: Dashboard }
-    ]);
-
     return (
         <ThemeProvider theme={defaultTheme}>
             <CssBaseline />
-            <RouterProvider router={hashRouter} />
+            <Dashboard />
         </ThemeProvider>
     );
 }
