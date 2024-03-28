@@ -2,21 +2,15 @@ import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import Product, { ProductResponse } from "../../models/Product";
-import { RootState } from "../../store";
-import { clearCategory, setCategory } from "../../store/slices/categorySlice";
-import { clearProducts, setProducts } from "../../store/slices/productsSlice";
 
 export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<any>): JSX.Element {
 
-    const dispatch = useDispatch();
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
-    const selectedCategory = useSelector<RootState>((state) => state.category) as string;
-    const selectedProducts = useSelector<RootState>((state) => state.products) as Product[];
-
-    const [categoryOptions, setCategoryOptions] = useState<string[]>([] as string[]);
-    const [productOptions, setProductOptions] = useState<Product[]>([] as Product[]);
+    const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+    const [productOptions, setProductOptions] = useState<Product[]>([]);
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,8 +28,8 @@ export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<a
      * Handle clear button actions
      */
     const clearFiltersHandler = (): void => {
-        dispatch(clearProducts()); // Clear Selected Product.
-        dispatch(clearCategory()); // Clear Selected Category.
+        setSelectedProducts([]); // Clear Selected Product.
+        setSelectedCategory(''); // Clear Selected Category.
         runPieReport(categoryOptions, 100 / categoryOptions.length);
     };
 
@@ -56,15 +50,15 @@ export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<a
 
     const handleCategoryValueChange = (category: string | null) => {
         if (category) {
-            dispatch(setCategory(category));
+            setSelectedCategory(category);
             axios.get(`/products/category/${category}`).then(({ data }: AxiosResponse<ProductResponse>) => {
-                dispatch(clearProducts()); // Clear products Selection
+                setSelectedProducts([]); // Clear Selected Product.
                 setProductOptions(data?.products ?? []); // Use Optional Chain to handle empty product options.
             });
         } else {
             setProductOptions([] as Product[]); // Clear Product Options.
-            dispatch(clearProducts()); // Clear Selected Product.
-            dispatch(clearCategory()); // Clear Selected Category.
+            setSelectedProducts([]); // Clear Selected Product.
+            setSelectedCategory(''); // Clear Selected Category.
             runPieReport(categoryOptions, 100 / categoryOptions.length);
         }
     };
@@ -91,7 +85,7 @@ export default function HomeFiters({ runColumnReport, runPieReport }: Readonly<a
                     options={productOptions.map((option: Product) => option) ?? []}
                     getOptionKey={((value: Product) => value.id)}
                     getOptionLabel={(option: Product) => option.title}
-                    onChange={(_event, value: Product[]) => dispatch(value.length > 0 ? setProducts(value) : clearProducts())}
+                    onChange={(_event, value: Product[]) => setSelectedProducts(value)}
                     value={selectedProducts} isOptionEqualToValue={(a, b) => a.id === b.id}
                     renderInput={(params) => <TextField {...params} placeholder="Select Product" />}
                     sx={{ width: 300 }}
