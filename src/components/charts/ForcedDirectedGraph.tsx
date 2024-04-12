@@ -11,6 +11,11 @@ export default function ForcedDirectedGraph() {
 
     useEffect(() => {
 
+        // The force simulation mutates links and nodes, so create a copy
+        // so that re-evaluating this cell produces the same result.
+        const links: any = data.links.map((d: any) => ({ ...d }));
+        const nodes: any = data.nodes.map((d: any) => ({ ...d }));
+
         // Specify the dimensions of the chart.
         const width = containerRef.current?.offsetWidth ?? 1600;
         const height = containerRef.current?.offsetHeight ?? 900;
@@ -18,23 +23,16 @@ export default function ForcedDirectedGraph() {
         // Specify the color scale.
         const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-        // The force simulation mutates links and nodes, so create a copy
-        // so that re-evaluating this cell produces the same result.
-        const links: any = data.links.map((d: any) => ({ ...d }));
-        const nodes: any = data.nodes.map((d: any) => ({ ...d }));
-
         // Create a simulation with several forces.
         const simulation = d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).distance(100).id((d: any) => d.id))
-            .force("charge", d3.forceManyBody().strength(-300))
-            .force('collision', d3.forceCollide().radius(10))
-            .force("x", d3.forceX())
-            .force("y", d3.forceY());
+            .force("link", d3.forceLink(links).distance(150).id((d: any) => d.id))
+            .force("charge", d3.forceManyBody().strength(-400))
+            .force('collision', d3.forceCollide().radius(80))
+            .force("x", d3.forceX()).force("y", d3.forceY());
 
         // Create the SVG container.
         const svg = d3.select(svgRef.current)
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", width).attr("height", height)
             .attr("viewBox", [-width / 2, -height / 2, width, height])
             .attr("style", "max-width: 100%; height: auto;");
 
@@ -45,30 +43,35 @@ export default function ForcedDirectedGraph() {
             .append("line").attr("stroke-width", 1.5);
 
         // Add a group for each node.
-        const nodeGroup = svg.append("g").selectAll("g").data(nodes).join("g");
+        const node = svg.append("g").selectAll("g").data(nodes).join("g");
 
         // Append circle to each node group.
-        nodeGroup.append("circle")
-            .attr("stroke", "#fff").attr("stroke-width", 1)
-            .attr("r", 30).attr("fill", (d: any) => color(d.group))
-            .attr('cursor', 'pointer')
+        node.append("circle")
+            .attr("stroke", "#fff").attr("stroke-width", 0.8).attr("r", 70)
+            .attr("fill", (d: any) => color(d.group)).attr('cursor', 'pointer')
             .append("title").text((d: any) => d.id);
 
         // Append text inside each node group.
-        nodeGroup.append("text")
-            .attr("text-anchor", "middle").attr("alignment-baseline", "central")
-            .attr("fill", "white").attr('cursor', 'pointer')
-            .attr("font-size", '9px').text((d: any) => String(d.id).substring(0, d.id.length > 10 ? 10 : d.id.length));
+        node.append("text")
+            .attr("text-anchor", "middle").attr("alignment-baseline", "after-edge")
+            .attr("fill", "white").attr('cursor', 'pointer').attr("font-size", '10px')
+            .text((d: any) => String(d.id).substring(0, d.id.length > 30 ? 30 : d.id.length));
+
+        // Append text inside each node group.
+        node.append("text")
+            .attr("text-anchor", "middle").attr("alignment-baseline", "before-edge")
+            .attr("fill", "white").attr('cursor', 'pointer').attr("font-size", '8px')
+            .text((d: any) => String(d.group).substring(0, d.group.length > 10 ? 10 : d.group.length));
 
         // Add a drag behavior.
-        nodeGroup.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended) as any);
+        node.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended) as any);
 
         // Set the position attributes of links and nodes each time the simulation ticks.
         simulation.on("tick", () => {
             link.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y);
             link.attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
             // Update node positions.
-            nodeGroup.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
+            node.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
         });
 
         // Reheat the simulation when drag starts, and fix the subject position.

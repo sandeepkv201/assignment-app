@@ -12,8 +12,8 @@ function App(): JSX.Element {
     });
 
     const routes = createBrowserRouter([
-        { path: '', Component: ForcedDirectedGraph },
-        { path: 'dashboard', Component: Dashboard },
+        { path: '', Component: Dashboard },
+        { path: 'dashboard', Component: ForcedDirectedGraph },
     ]);
 
     return (

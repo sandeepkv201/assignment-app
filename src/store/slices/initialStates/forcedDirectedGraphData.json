@@ -1,29 +1,78 @@
 {
     "nodes": [
         {
-            "id": "Structural basis of PROTAC cooperative recognition for selective protein degradation.",
-            "group": "Cited Works",
-            "radius": 2
+            "id": "BrandReportQueryService",
+            "group": "Class"
         },
         {
-            "id": "109-294-662-661-65X",
-            "group": "Citing Patents"
+            "id": "AbstractBaseServiceDataUtil",
+            "group": "Class"
         },
         {
-            "id": "074-937-457-594-345",
-            "group": "Citing Patents"
+            "id": "ReportsResource",
+            "group": "Controller"
+        },
+        {
+            "id": "BrandReportResult",
+            "group": "Class"
+        },
+        {
+            "id": "IReportQuery",
+            "group": "Interface"
+        },
+        {
+            "id": "IBasicReportQuery",
+            "group": "Interface"
+        },
+        {
+            "id": "ICvCached",
+            "group": "Interface"
+        },
+        {
+            "id": "IReportExecutor",
+            "group": "Interface"
+        },
+        {
+            "id": "IExecuter",
+            "group": "Interface"
+        },
+        {
+            "id": "ITestebleExecuter",
+            "group": "Interface"
+        },
+        {
+            "id": "IQueryGenerator",
+            "group": "Interface"
+        },
+        {
+            "id": "ReportPeriodData",
+            "group": "Class"
         }
     ],
     "links": [
         {
-            "source": "Structural basis of PROTAC cooperative recognition for selective protein degradation.",
-            "target": "109-294-662-661-65X",
-            "value": 2
+            "source": "BrandReportQueryService",
+            "target": "AbstractBaseServiceDataUtil"
         },
         {
-            "source": "Structural basis of PROTAC cooperative recognition for selective protein degradation.",
-            "target": "074-937-457-594-345",
-            "value": 2
+            "source": "ICvCached",
+            "target": "IBasicReportQuery"
+        },
+        {
+            "source": "IBasicReportQuery",
+            "target": "IReportQuery"
+        },
+        {
+            "source": "IExecuter",
+            "target": "IReportExecutor"
+        },
+        {
+            "source": "ITestebleExecuter",
+            "target": "IReportExecutor"
+        },
+        {
+            "source": "IQueryGenerator",
+            "target": "IReportExecutor"
         }
     ]
 }

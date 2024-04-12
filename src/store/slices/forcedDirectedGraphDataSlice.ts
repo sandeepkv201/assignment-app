@@ -11,7 +11,7 @@ export interface ForcedDirectedNode {
 export interface ForcedDirectedLink {
     source: string;
     target: string;
-    value: number;
+    value?: number;
 }
 
 export interface ForcedDirectedGraphData {
