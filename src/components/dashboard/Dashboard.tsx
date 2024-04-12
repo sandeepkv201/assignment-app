@@ -9,7 +9,7 @@ function Dashboard(): JSX.Element {
 
     const [showColumnChart, setShowColumnChart] = useState<boolean>(false);
 
-    const [pieOptions, setPieOpitons] = useState<Highcharts.Options>({});
+    const [pieOptions, setPieOptions] = useState<Highcharts.Options>({});
     const [columnOptions, setColumnOptions] = useState<Highcharts.Options>({});
 
     /**
@@ -17,7 +17,7 @@ function Dashboard(): JSX.Element {
      */
     const runPieReport = useCallback((categories: string[], y: number) => {
         setShowColumnChart(false);
-        setPieOpitons({
+        setPieOptions({
             title: { text: `${categories.length} Categories Overview`, align: 'left' },
             series: [{ name: 'Series', data: categories.map(name => ({ name, y })) }] as Highcharts.SeriesPieOptions[]
         });

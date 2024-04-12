@@ -1,4 +1,6 @@
 import { CssBaseline, Theme, ThemeProvider, createTheme } from '@mui/material';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import ForcedDirectedGraph from './charts/ForcedDirectedGraph';
 import Dashboard from './dashboard/Dashboard';
 
 function App(): JSX.Element {
@@ -9,10 +11,15 @@ function App(): JSX.Element {
         }
     });
 
+    const routes = createBrowserRouter([
+        { path: '', Component: ForcedDirectedGraph },
+        { path: 'dashboard', Component: Dashboard },
+    ]);
+
     return (
         <ThemeProvider theme={defaultTheme}>
             <CssBaseline />
-            <Dashboard />
+            <RouterProvider router={routes} />
         </ThemeProvider>
     );
 }

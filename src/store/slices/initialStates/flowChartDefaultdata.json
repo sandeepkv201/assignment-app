@@ -1,0 +1,40 @@
+{
+    "name": "civalue",
+    "children": [
+        {
+            "name": "IBasicReportQuery",
+            "type": "Interface",
+            "children": [
+                {
+                    "name": "IReportQuery",
+                    "type": "Interface",
+                    "children": [
+                        {
+                            "name": "ReportQueryImpl",
+                            "type": "Class"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "AbstractBaseServiceDataUtil",
+            "type": "Abstract",
+            "children": [
+                {
+                    "name": "BrandReportQueryService",
+                    "type": "Class",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "ReportsResource",
+            "type": "Controller"
+        },
+        {
+            "name": "IReportExecutor",
+            "type": "Interface"
+        }
+    ]
+}
