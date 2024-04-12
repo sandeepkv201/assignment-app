@@ -40,34 +40,35 @@ export default function ForcedDirectedGraph() {
 
         // Add a line for each link, and a circle for each node.
         const link = svg.append("g")
-            .attr("stroke", "#999")
-            .attr("stroke-opacity", 0.6)
-            .selectAll("line")
-            .data(links)
-            .join("line")
-            .attr("stroke-width", 1.5);
+            .attr("stroke", "#999").attr("stroke-opacity", 0.6)
+            .selectAll("line").data(links).enter()
+            .append("line").attr("stroke-width", 1.5);
 
-        // Add cicles for each node.
-        const node = svg.append("g")
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 1.5)
-            .selectAll("circle")
-            .data(nodes)
-            .join("circle")
-            .attr("r", 15)
-            .attr("fill", (d: any) => color(d.group));
+        // Add a group for each node.
+        const nodeGroup = svg.append("g").selectAll("g").data(nodes).join("g");
 
-        // Add Title for Tooltip.
-        node.append("title").text((d: any) => d.id);
+        // Append circle to each node group.
+        nodeGroup.append("circle")
+            .attr("stroke", "#fff").attr("stroke-width", 1)
+            .attr("r", 30).attr("fill", (d: any) => color(d.group))
+            .attr('cursor', 'pointer')
+            .append("title").text((d: any) => d.id);
+
+        // Append text inside each node group.
+        nodeGroup.append("text")
+            .attr("text-anchor", "middle").attr("alignment-baseline", "central")
+            .attr("fill", "white").attr('cursor', 'pointer')
+            .attr("font-size", '9px').text((d: any) => String(d.id).substring(0, d.id.length > 10 ? 10 : d.id.length));
 
         // Add a drag behavior.
-        node.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended) as any);
+        nodeGroup.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended) as any);
 
         // Set the position attributes of links and nodes each time the simulation ticks.
         simulation.on("tick", () => {
             link.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y);
             link.attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
-            node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+            // Update node positions.
+            nodeGroup.attr("transform", (d: any) => `translate(${d.x},${d.y})`);
         });
 
         // Reheat the simulation when drag starts, and fix the subject position.
@@ -90,11 +91,6 @@ export default function ForcedDirectedGraph() {
             event.subject.fx = null;
             event.subject.fy = null;
         }
-
-        // When this cell is re-run, stop the previous simulation. (This doesn’t
-        // really matter since the target alpha is zero and the simulation will
-        // stop naturally, but it’s a good practice.)
-        // invalidation.then(() => simulation.stop());
 
         // Cleanup logic.
         return () => {
